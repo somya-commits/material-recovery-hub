@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { Flame, Droplets, Bug, Leaf, DollarSign, Mountain, ArrowRight, Zap, Beaker, Microscope } from "lucide-react";
+import { Leaf, DollarSign, Mountain, ArrowRight } from "lucide-react";
+import { useGame } from "@/contexts/GameContext";
 
 const techCards = [
   {
@@ -9,7 +10,7 @@ const techCards = [
     description: "High-temperature processes like smelting and roasting to extract metals from ores and e-waste.",
     cardClass: "tech-card-fire",
     route: "/pyrometallurgy",
-    color: "fire",
+    techId: "pyro",
   },
   {
     title: "Hydrometallurgy",
@@ -17,7 +18,7 @@ const techCards = [
     description: "Aqueous chemistry-based extraction using leaching, solvent extraction, and electrowinning.",
     cardClass: "tech-card-water",
     route: "/hydrometallurgy",
-    color: "water",
+    techId: "hydro",
   },
   {
     title: "Bioleaching",
@@ -25,7 +26,7 @@ const techCards = [
     description: "Microbial-assisted dissolution of metals using bacteria like Acidithiobacillus ferrooxidans.",
     cardClass: "tech-card-bio",
     route: "/bioleaching",
-    color: "bio",
+    techId: "bio",
   },
 ];
 
@@ -40,6 +41,14 @@ const comparisonData = [
 
 const Index = () => {
   const navigate = useNavigate();
+  const { state, getUnlockedSteps, isQuizCompleted } = useGame();
+
+  const totalProgress = (() => {
+    const stepsTotal = 15; // 5 per tech × 3
+    const stepsDone = (getUnlockedSteps("pyro") + getUnlockedSteps("hydro") + getUnlockedSteps("bio"));
+    const quizDone = (isQuizCompleted("pyro") ? 1 : 0) + (isQuizCompleted("hydro") ? 1 : 0) + (isQuizCompleted("bio") ? 1 : 0);
+    return Math.round(((stepsDone + quizDone * 3) / (stepsTotal + 9)) * 100);
+  })();
 
   return (
     <div className="gradient-bg min-h-screen pt-16">
@@ -52,7 +61,7 @@ const Index = () => {
         <div className="container mx-auto px-6 text-center relative z-10">
           <ScrollReveal>
             <p className="text-sm font-mono font-medium tracking-widest uppercase text-primary mb-4">
-              Educational Resource
+              🎮 Gamified Learning Experience
             </p>
           </ScrollReveal>
           <ScrollReveal delay={100}>
@@ -62,10 +71,23 @@ const Index = () => {
             </h1>
           </ScrollReveal>
           <ScrollReveal delay={200}>
-            <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed text-pretty">
-              Discover how metals like gold, silver, and copper are recovered from electronic waste
-              and mineral ores through advanced metallurgical processes.
+            <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed text-pretty mb-8">
+              Unlock steps, answer quizzes, earn XP, and collect achievements as you learn about metal recovery from e-waste and ores.
             </p>
+          </ScrollReveal>
+
+          {/* Overall Progress */}
+          <ScrollReveal delay={300}>
+            <div className="glass-card inline-flex items-center gap-4 px-6 py-3 mx-auto">
+              <span className="text-sm font-medium text-foreground">Course Progress</span>
+              <div className="w-32 h-2.5 rounded-full bg-secondary overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-1000"
+                  style={{ width: `${totalProgress}%` }}
+                />
+              </div>
+              <span className="text-sm font-mono text-primary">{totalProgress}%</span>
+            </div>
           </ScrollReveal>
         </div>
       </section>
@@ -75,34 +97,59 @@ const Index = () => {
         <div className="container mx-auto px-6">
           <ScrollReveal>
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 text-foreground">
-              Explore the Processes
+              Choose Your Path
             </h2>
             <p className="text-muted-foreground text-center mb-12 max-w-lg mx-auto">
-              Click on any technology to learn its step-by-step process.
+              Each technology has 5 unlockable steps and a quiz. Complete them all to become a Material Recovery Master!
             </p>
           </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {techCards.map((card, i) => (
-              <ScrollReveal key={card.title} delay={i * 80}>
-                <div
-                  className={`${card.cardClass} p-8 text-center group`}
-                  onClick={() => navigate(card.route)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === "Enter" && navigate(card.route)}
-                >
-                  <div className="text-5xl mb-5">{card.emoji}</div>
-                  <h3 className="text-xl font-semibold mb-3 text-foreground">{card.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                    {card.description}
-                  </p>
-                  <div className="flex items-center justify-center gap-2 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Learn more <ArrowRight className="h-4 w-4" />
+            {techCards.map((card, i) => {
+              const stepsComplete = getUnlockedSteps(card.techId);
+              const quizDone = isQuizCompleted(card.techId);
+              return (
+                <ScrollReveal key={card.title} delay={i * 80}>
+                  <div
+                    className={`${card.cardClass} p-8 text-center group`}
+                    onClick={() => navigate(card.route)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && navigate(card.route)}
+                  >
+                    <div className="text-5xl mb-5">{card.emoji}</div>
+                    <h3 className="text-xl font-semibold mb-3 text-foreground">{card.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                      {card.description}
+                    </p>
+
+                    {/* Progress indicators */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Steps</span>
+                        <span className="font-mono text-foreground">{stepsComplete}/5</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full transition-all duration-500"
+                          style={{ width: `${(stepsComplete / 5) * 100}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Quiz</span>
+                        <span className={`font-mono ${quizDone ? "text-bio" : "text-muted-foreground"}`}>
+                          {quizDone ? "✓ Passed" : "Not taken"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-2 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      {stepsComplete === 5 && quizDone ? "Review" : "Continue"} <ArrowRight className="h-4 w-4" />
+                    </div>
                   </div>
-                </div>
-              </ScrollReveal>
-            ))}
+                </ScrollReveal>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -172,7 +219,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-border/40 py-8">
         <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
           Educational resource on material recovery technologies.
