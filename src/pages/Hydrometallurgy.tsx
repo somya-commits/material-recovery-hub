@@ -1,16 +1,56 @@
-import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import FlowStep from "@/components/FlowStep";
-import { ScrollReveal } from "@/components/ScrollReveal";
-import QuizSection from "@/components/QuizSection";
-import { useGame } from "@/contexts/GameContext";
+import TechStepPage from "@/components/TechStepPage";
 
 const steps = [
-  { icon: "📱", title: "Step 1: Waste Material", description: "E-waste or low-grade ores are collected as feedstock for aqueous processing.", color: "water" },
-  { icon: "⚙️", title: "Step 2: Pre-processing", description: "Mechanical crushing and grinding to liberate metal-bearing particles.", color: "water" },
-  { icon: "💧", title: "Step 3: Leaching", description: "Metals are dissolved using acids (H₂SO₄, HCl) or cyanide solutions to form metal-ion complexes in solution.", color: "water" },
-  { icon: "🧪", title: "Step 4: Purification & Refining", description: "Solvent extraction, ion exchange, or electrowinning to isolate and purify individual metals.", color: "water" },
-  { icon: "🥇", title: "Step 5: Pure Metals", description: "Recovered metals: gold (Au), silver (Ag), copper (Cu), nickel (Ni), and rare earth elements.", color: "water" },
+  {
+    icon: "📱",
+    title: "Waste Material Collection",
+    description: "E-waste or low-grade ores are collected as feedstock for aqueous chemical processing.",
+    details: [
+      "Circuit boards, batteries, and catalytic converters are common sources",
+      "Low-grade ores uneconomical for smelting are ideal candidates",
+      "Materials are inventoried and categorized by metal content",
+    ],
+  },
+  {
+    icon: "⚙️",
+    title: "Pre-processing",
+    description: "Mechanical crushing and grinding liberate metal-bearing particles from the bulk material.",
+    details: [
+      "Size reduction increases the surface area for chemical attack",
+      "Screening separates particles by size for uniform processing",
+      "De-coating removes plastic or paint layers from e-waste",
+    ],
+  },
+  {
+    icon: "💧",
+    title: "Leaching",
+    description: "Metals are dissolved using acids (H₂SO₄, HCl) or cyanide solutions to form metal-ion complexes in aqueous solution.",
+    details: [
+      "Sulfuric acid dissolves base metals like copper and nickel",
+      "Cyanide solutions selectively dissolve gold and silver",
+      "Temperature and pH are carefully controlled for selectivity",
+    ],
+  },
+  {
+    icon: "🧪",
+    title: "Purification & Refining",
+    description: "Solvent extraction, ion exchange, or electrowinning isolate and purify individual metals from the leach solution.",
+    details: [
+      "Solvent extraction separates metals using organic solvents",
+      "Electrowinning plates pure metal onto cathodes using electricity",
+      "Ion exchange resins selectively capture target metal ions",
+    ],
+  },
+  {
+    icon: "🥇",
+    title: "Pure Metals Output",
+    description: "Recovered metals include gold (Au), silver (Ag), copper (Cu), nickel (Ni), and rare earth elements at commercial purity.",
+    details: [
+      "Copper cathodes achieve 99.99% purity",
+      "Precious metals are further refined to bullion grade",
+      "Rare earth elements are separated into individual oxides",
+    ],
+  },
 ];
 
 const quizQuestions = [
@@ -20,68 +60,17 @@ const quizQuestions = [
   { question: "Hydrometallurgy operates at what temperature range?", options: ["1000–1500°C", "500–800°C", "25–100°C", "Below 0°C"], correct: 2 },
 ];
 
-const Hydrometallurgy = () => {
-  const { unlockStep, getUnlockedSteps, watchVideo } = useGame();
-  const unlocked = getUnlockedSteps("hydro");
-
-  return (
-    <div className="gradient-bg min-h-screen pt-16">
-      <div className="container mx-auto px-6 py-16 md:py-24">
-        <ScrollReveal>
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
-            <ArrowLeft className="h-4 w-4" /> Back to Home
-          </Link>
-        </ScrollReveal>
-
-        <ScrollReveal delay={50}>
-          <div className="text-center mb-16">
-            <span className="text-5xl mb-4 block">💧</span>
-            <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-4">Hydrometallurgy</h1>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Aqueous-based metal extraction using chemical leaching, solvent extraction, and electrowinning processes.
-            </p>
-            <p className="text-sm text-primary mt-4 font-mono">Unlock each step to earn XP!</p>
-          </div>
-        </ScrollReveal>
-
-        <div className="flex flex-col items-center gap-0 mb-20">
-          {steps.map((step, i) => (
-            <ScrollReveal key={step.title} delay={i * 60}>
-              <FlowStep
-                {...step}
-                stepIndex={i}
-                unlocked={i < unlocked}
-                onUnlock={() => {
-                  if (i === 0 || i < unlocked + 1) unlockStep("hydro", i + 1);
-                }}
-                isLast={i === steps.length - 1}
-              />
-            </ScrollReveal>
-          ))}
-        </div>
-
-        <ScrollReveal>
-          <div className="max-w-3xl mx-auto mb-16">
-            <h2 className="text-2xl font-bold text-center mb-6 text-foreground">Watch: Hydrometallurgy Explained</h2>
-            <div className="glass-card overflow-hidden aspect-video" onClick={() => watchVideo("hydro")}>
-              <iframe
-                className="w-full h-full"
-                src="https://www.youtube.com/embed/Kv8knVosXsg"
-                title="Hydrometallurgy Process"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-            <p className="text-center text-xs text-muted-foreground mt-2 font-mono">+15 XP for watching</p>
-          </div>
-        </ScrollReveal>
-
-        <div className="mb-16">
-          <QuizSection techId="hydro" title="Hydrometallurgy" questions={quizQuestions} />
-        </div>
-      </div>
-    </div>
-  );
-};
+const Hydrometallurgy = () => (
+  <TechStepPage
+    techId="hydro"
+    techName="Hydrometallurgy"
+    techEmoji="💧"
+    techColor="water"
+    steps={steps}
+    videoUrl="https://www.youtube.com/embed/Kv8knVosXsg"
+    videoTitle="Hydrometallurgy Explained"
+    quizQuestions={quizQuestions}
+  />
+);
 
 export default Hydrometallurgy;
