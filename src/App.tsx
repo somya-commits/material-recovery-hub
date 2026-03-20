@@ -19,8 +19,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <GameProvider>
+      <GameProvider>
+        <BrowserRouter>
           <Navbar />
           <AchievementPopup />
           <Routes>
@@ -30,8 +30,8 @@ const App = () => (
             <Route path="/bioleaching" element={<Bioleaching />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </GameProvider>
-      </BrowserRouter>
+        </BrowserRouter>
+      </GameProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
