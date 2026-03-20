@@ -9,6 +9,7 @@ interface StepData {
   title: string;
   description: string;
   details: string[];
+  image: string;
 }
 
 interface StepPageProps {
