@@ -1,55 +1,40 @@
 import TechStepPage from "@/components/TechStepPage";
+import imgWaste from "@/assets/step-waste-material.jpg";
+import imgPreprocess from "@/assets/step-preprocessing.jpg";
+import imgSmelting from "@/assets/step-pyro-smelting.jpg";
+import imgPurification from "@/assets/step-purification.jpg";
+import imgPureMetals from "@/assets/step-pure-metals.jpg";
 
 const steps = [
   {
-    icon: "📱",
-    title: "Waste Material Collection",
+    icon: "📱", title: "Waste Material Collection",
     description: "E-waste like circuit boards, cables, and old electronics — or mineral ores — are gathered as raw feedstock for metal recovery.",
-    details: [
-      "Sources include discarded phones, computers, and industrial scrap",
-      "Mineral ores from mines also serve as primary feedstock",
-      "Materials are sorted by type for efficient processing",
-    ],
+    details: ["Sources include discarded phones, computers, and industrial scrap", "Mineral ores from mines also serve as primary feedstock", "Materials are sorted by type for efficient processing"],
+    image: imgWaste,
   },
   {
-    icon: "⚙️",
-    title: "Pre-processing",
+    icon: "⚙️", title: "Pre-processing",
     description: "Raw materials are crushed, ground, and sorted to increase surface area and separate valuable components from waste.",
-    details: [
-      "Crushing breaks large pieces into smaller fragments",
-      "Grinding reduces particle size for better heat transfer",
-      "Magnetic and density-based sorting separates metals from non-metals",
-    ],
+    details: ["Crushing breaks large pieces into smaller fragments", "Grinding reduces particle size for better heat transfer", "Magnetic and density-based sorting separates metals from non-metals"],
+    image: imgPreprocess,
   },
   {
-    icon: "🔥",
-    title: "Smelting & Roasting",
+    icon: "🔥", title: "Smelting & Roasting",
     description: "Materials are heated to extreme temperatures (1000–1500°C) in industrial furnaces. Metals melt and separate from slag.",
-    details: [
-      "Roasting oxidizes sulfide ores at high temperatures",
-      "Smelting melts the concentrate to separate metal from slag",
-      "Flux agents help lower melting points and remove impurities",
-    ],
+    details: ["Roasting oxidizes sulfide ores at high temperatures", "Smelting melts the concentrate to separate metal from slag", "Flux agents help lower melting points and remove impurities"],
+    image: imgSmelting,
   },
   {
-    icon: "🧪",
-    title: "Purification & Refining",
+    icon: "🧪", title: "Purification & Refining",
     description: "Crude metals undergo electrolytic refining and chemical treatments to remove remaining impurities and achieve high purity.",
-    details: [
-      "Electrolytic refining uses electricity to deposit pure metal",
-      "Chemical treatments remove trace impurities",
-      "Quality control ensures commercial-grade purity (99.9%+)",
-    ],
+    details: ["Electrolytic refining uses electricity to deposit pure metal", "Chemical treatments remove trace impurities", "Quality control ensures commercial-grade purity (99.9%+)"],
+    image: imgPurification,
   },
   {
-    icon: "🥇",
-    title: "Pure Metals Output",
+    icon: "🥇", title: "Pure Metals Output",
     description: "The final product: high-purity gold (Au), silver (Ag), copper (Cu), and other valuable metals ready for industrial use.",
-    details: [
-      "Gold, silver, copper, and platinum group metals recovered",
-      "Metals are cast into ingots or processed into wire/sheet",
-      "Ready for electronics, jewelry, and industrial applications",
-    ],
+    details: ["Gold, silver, copper, and platinum group metals recovered", "Metals are cast into ingots or processed into wire/sheet", "Ready for electronics, jewelry, and industrial applications"],
+    image: imgPureMetals,
   },
 ];
 
@@ -62,14 +47,9 @@ const quizQuestions = [
 
 const Pyrometallurgy = () => (
   <TechStepPage
-    techId="pyro"
-    techName="Pyrometallurgy"
-    techEmoji="🔥"
-    techColor="fire"
-    steps={steps}
-    videoUrl="https://www.youtube.com/embed/XJn9NRkkJqk"
-    videoTitle="Pyrometallurgy Explained"
-    quizQuestions={quizQuestions}
+    techId="pyro" techName="Pyrometallurgy" techEmoji="🔥" techColor="fire"
+    steps={steps} videoUrl="https://www.youtube.com/embed/XJn9NRkkJqk"
+    videoTitle="Pyrometallurgy Explained" quizQuestions={quizQuestions}
   />
 );
 

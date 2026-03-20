@@ -1,55 +1,40 @@
 import TechStepPage from "@/components/TechStepPage";
+import imgWaste from "@/assets/step-waste-material.jpg";
+import imgPreprocess from "@/assets/step-preprocessing.jpg";
+import imgLeaching from "@/assets/step-hydro-leaching.jpg";
+import imgPurification from "@/assets/step-purification.jpg";
+import imgPureMetals from "@/assets/step-pure-metals.jpg";
 
 const steps = [
   {
-    icon: "📱",
-    title: "Waste Material Collection",
+    icon: "📱", title: "Waste Material Collection",
     description: "E-waste or low-grade ores are collected as feedstock for aqueous chemical processing.",
-    details: [
-      "Circuit boards, batteries, and catalytic converters are common sources",
-      "Low-grade ores uneconomical for smelting are ideal candidates",
-      "Materials are inventoried and categorized by metal content",
-    ],
+    details: ["Circuit boards, batteries, and catalytic converters are common sources", "Low-grade ores uneconomical for smelting are ideal candidates", "Materials are inventoried and categorized by metal content"],
+    image: imgWaste,
   },
   {
-    icon: "⚙️",
-    title: "Pre-processing",
+    icon: "⚙️", title: "Pre-processing",
     description: "Mechanical crushing and grinding liberate metal-bearing particles from the bulk material.",
-    details: [
-      "Size reduction increases the surface area for chemical attack",
-      "Screening separates particles by size for uniform processing",
-      "De-coating removes plastic or paint layers from e-waste",
-    ],
+    details: ["Size reduction increases the surface area for chemical attack", "Screening separates particles by size for uniform processing", "De-coating removes plastic or paint layers from e-waste"],
+    image: imgPreprocess,
   },
   {
-    icon: "💧",
-    title: "Leaching",
+    icon: "💧", title: "Leaching",
     description: "Metals are dissolved using acids (H₂SO₄, HCl) or cyanide solutions to form metal-ion complexes in aqueous solution.",
-    details: [
-      "Sulfuric acid dissolves base metals like copper and nickel",
-      "Cyanide solutions selectively dissolve gold and silver",
-      "Temperature and pH are carefully controlled for selectivity",
-    ],
+    details: ["Sulfuric acid dissolves base metals like copper and nickel", "Cyanide solutions selectively dissolve gold and silver", "Temperature and pH are carefully controlled for selectivity"],
+    image: imgLeaching,
   },
   {
-    icon: "🧪",
-    title: "Purification & Refining",
+    icon: "🧪", title: "Purification & Refining",
     description: "Solvent extraction, ion exchange, or electrowinning isolate and purify individual metals from the leach solution.",
-    details: [
-      "Solvent extraction separates metals using organic solvents",
-      "Electrowinning plates pure metal onto cathodes using electricity",
-      "Ion exchange resins selectively capture target metal ions",
-    ],
+    details: ["Solvent extraction separates metals using organic solvents", "Electrowinning plates pure metal onto cathodes using electricity", "Ion exchange resins selectively capture target metal ions"],
+    image: imgPurification,
   },
   {
-    icon: "🥇",
-    title: "Pure Metals Output",
+    icon: "🥇", title: "Pure Metals Output",
     description: "Recovered metals include gold (Au), silver (Ag), copper (Cu), nickel (Ni), and rare earth elements at commercial purity.",
-    details: [
-      "Copper cathodes achieve 99.99% purity",
-      "Precious metals are further refined to bullion grade",
-      "Rare earth elements are separated into individual oxides",
-    ],
+    details: ["Copper cathodes achieve 99.99% purity", "Precious metals are further refined to bullion grade", "Rare earth elements are separated into individual oxides"],
+    image: imgPureMetals,
   },
 ];
 
@@ -62,14 +47,9 @@ const quizQuestions = [
 
 const Hydrometallurgy = () => (
   <TechStepPage
-    techId="hydro"
-    techName="Hydrometallurgy"
-    techEmoji="💧"
-    techColor="water"
-    steps={steps}
-    videoUrl="https://www.youtube.com/embed/Kv8knVosXsg"
-    videoTitle="Hydrometallurgy Explained"
-    quizQuestions={quizQuestions}
+    techId="hydro" techName="Hydrometallurgy" techEmoji="💧" techColor="water"
+    steps={steps} videoUrl="https://www.youtube.com/embed/Kv8knVosXsg"
+    videoTitle="Hydrometallurgy Explained" quizQuestions={quizQuestions}
   />
 );
 

@@ -9,6 +9,7 @@ interface StepData {
   title: string;
   description: string;
   details: string[];
+  image: string;
 }
 
 interface StepPageProps {
@@ -111,7 +112,15 @@ const TechStepPage = ({
               <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-4 block">
                 Step {currentScreen + 1} of {steps.length}
               </span>
-              <div className="text-6xl mb-6">{steps[currentScreen].icon}</div>
+              {/* Step Image */}
+              <div className="rounded-xl overflow-hidden mb-6 max-w-md mx-auto">
+                <img
+                  src={steps[currentScreen].image}
+                  alt={steps[currentScreen].title}
+                  className="w-full h-48 md:h-56 object-cover"
+                />
+              </div>
+              <div className="text-4xl mb-4">{steps[currentScreen].icon}</div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
                 {steps[currentScreen].title}
               </h1>
