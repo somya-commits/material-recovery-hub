@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Lock, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock, CheckCircle2, Star, Trophy, Play, Zap } from "lucide-react";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { useGame } from "@/contexts/GameContext";
 
@@ -31,188 +31,352 @@ const TechStepPage = ({
   const navigate = useNavigate();
   const unlocked = getUnlockedSteps(techId);
 
-  // Total screens: steps + video + quiz = steps.length + 2
-  const totalScreens = steps.length + 2;
-  const [currentScreen, setCurrentScreen] = useState(0);
+  const [activeNode, setActiveNode] = useState<number | null>(null);
+  const [showVideo, setShowVideo] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
 
-  const isStepScreen = currentScreen < steps.length;
-  const isVideoScreen = currentScreen === steps.length;
-  const isQuizScreen = currentScreen === steps.length + 1;
+  const totalNodes = steps.length + 2; // steps + video + quiz
+  const glowVar = `--glow-${techColor}`;
 
-  const canAccessScreen = (screen: number) => {
-    if (screen === 0) return true;
-    if (screen <= steps.length) return unlocked >= screen;
-    if (screen === steps.length + 1) return unlocked >= steps.length;
-    return false;
+  const canAccess = (i: number) => {
+    if (i === 0) return true;
+    if (i < steps.length) return unlocked >= i;
+    if (i === steps.length) return unlocked >= steps.length; // video
+    return unlocked >= steps.length; // quiz
   };
 
-  const handleUnlockAndNext = () => {
-    if (isStepScreen) {
-      const stepNum = currentScreen + 1;
-      if (unlocked < stepNum) unlockStep(techId, stepNum);
-      if (currentScreen < totalScreens - 1) setCurrentScreen(currentScreen + 1);
+  const isCompleted = (i: number) => {
+    if (i < steps.length) return unlocked > i;
+    if (i === steps.length) return false;
+    return isQuizCompleted(techId);
+  };
+
+  const handleNodeClick = (i: number) => {
+    if (!canAccess(i)) return;
+    if (i < steps.length) {
+      setActiveNode(i);
+      setShowVideo(false);
+      setShowQuiz(false);
+    } else if (i === steps.length) {
+      setActiveNode(null);
+      setShowVideo(true);
+      setShowQuiz(false);
+    } else {
+      setActiveNode(null);
+      setShowVideo(false);
+      setShowQuiz(true);
     }
   };
 
-  const glowClass = techColor === "fire" ? "glow-fire" : techColor === "water" ? "glow-water" : "glow-bio";
-  const borderColor = `hsl(var(--glow-${techColor}) / 0.4)`;
+  const handleUnlock = () => {
+    if (activeNode === null) return;
+    const stepNum = activeNode + 1;
+    if (unlocked < stepNum) unlockStep(techId, stepNum);
+  };
+
+  const nodeLabel = (i: number) => {
+    if (i < steps.length) return steps[i].title;
+    if (i === steps.length) return "Video";
+    return "Quiz";
+  };
+
+  const nodeIcon = (i: number) => {
+    if (i < steps.length) return steps[i].icon;
+    if (i === steps.length) return "🎬";
+    return "🎯";
+  };
+
+  // Path positions — zigzag pattern
+  const getNodePosition = (i: number) => {
+    const isLeft = i % 2 === 0;
+    return { x: isLeft ? 25 : 75, y: i };
+  };
 
   return (
     <div className="gradient-bg min-h-screen pt-16">
-      <div className="container mx-auto px-6 py-12 md:py-20 max-w-3xl">
+      <div className="container mx-auto px-6 py-12 md:py-16 max-w-5xl">
         {/* Header */}
         <ScrollReveal>
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="h-4 w-4" /> Home
             </Link>
-            <span className="text-sm font-mono text-muted-foreground">
-              {techEmoji} {techName}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{techEmoji}</span>
+              <span className="text-lg font-bold text-foreground">{techName}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-sm font-mono text-primary">
+              <Star className="h-4 w-4" />
+              {unlocked}/{steps.length}
+            </div>
           </div>
         </ScrollReveal>
 
-        {/* Progress dots */}
-        <ScrollReveal delay={50}>
-          <div className="flex items-center justify-center gap-2 mb-10">
-            {Array.from({ length: totalScreens }).map((_, i) => {
-              const accessible = canAccessScreen(i);
-              const active = i === currentScreen;
-              const completed = i < steps.length ? unlocked > i : i === steps.length ? false : isQuizCompleted(techId);
-              return (
-                <button
-                  key={i}
-                  onClick={() => accessible && setCurrentScreen(i)}
-                  disabled={!accessible}
-                  className={`relative w-3 h-3 rounded-full transition-all duration-300 ${
-                    active
-                      ? "bg-primary scale-125 ring-2 ring-primary/30"
-                      : completed
-                        ? "bg-bio"
-                        : accessible
-                          ? "bg-secondary hover:bg-muted-foreground/40 cursor-pointer"
-                          : "bg-secondary/50"
-                  }`}
-                  title={
-                    i < steps.length ? `Step ${i + 1}` : i === steps.length ? "Video" : "Quiz"
-                  }
-                />
-              );
-            })}
-          </div>
-        </ScrollReveal>
+        <div className="grid lg:grid-cols-[320px_1fr] gap-8">
+          {/* Level Map */}
+          <ScrollReveal>
+            <div className="glass-card p-6 relative">
+              <h3 className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-6 text-center">
+                Level Map
+              </h3>
+              <div className="relative flex flex-col items-center gap-2">
+                {Array.from({ length: totalNodes }).map((_, i) => {
+                  const accessible = canAccess(i);
+                  const completed = isCompleted(i);
+                  const pos = getNodePosition(i);
+                  const isActive =
+                    (i < steps.length && activeNode === i) ||
+                    (i === steps.length && showVideo) ||
+                    (i === steps.length + 1 && showQuiz);
 
-        {/* Step Screen */}
-        {isStepScreen && (
-          <div key={currentScreen} className="animate-fade-up">
-            <div
-              className={`glass-card p-8 md:p-12 text-center ${canAccessScreen(currentScreen) ? glowClass : ""}`}
-              style={{ borderColor: canAccessScreen(currentScreen) ? borderColor : undefined }}
-            >
-              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-4 block">
-                Step {currentScreen + 1} of {steps.length}
-              </span>
-              {/* Step Image */}
-              <div className="rounded-xl overflow-hidden mb-6 max-w-md mx-auto">
-                <img
-                  src={steps[currentScreen].image}
-                  alt={steps[currentScreen].title}
-                  className="w-full h-48 md:h-56 object-cover"
-                />
+                  return (
+                    <div key={i} className="w-full">
+                      {/* Connector line */}
+                      {i > 0 && (
+                        <div className="flex justify-center my-1">
+                          <div
+                            className="w-0.5 h-6 rounded-full transition-colors duration-300"
+                            style={{
+                              background: completed || accessible
+                                ? `linear-gradient(to bottom, hsl(var(${glowVar}) / 0.6), hsl(var(${glowVar}) / 0.2))`
+                                : "hsl(var(--border) / 0.3)",
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {/* Node */}
+                      <button
+                        onClick={() => handleNodeClick(i)}
+                        disabled={!accessible}
+                        className={`
+                          w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 group relative
+                          ${isActive
+                            ? "bg-primary/15 border border-primary/40 scale-[1.02]"
+                            : accessible
+                              ? "hover:bg-secondary/60 border border-transparent hover:border-border/50"
+                              : "opacity-40 cursor-not-allowed border border-transparent"
+                          }
+                        `}
+                        style={isActive ? {
+                          boxShadow: `0 0 20px hsl(var(${glowVar}) / 0.2)`,
+                        } : {}}
+                      >
+                        {/* Node circle */}
+                        <div
+                          className={`
+                            relative w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0
+                            transition-all duration-300
+                            ${completed
+                              ? "bg-bio/20 border-2 border-bio/50"
+                              : isActive
+                                ? "border-2 bg-primary/20"
+                                : accessible
+                                  ? "bg-secondary border-2 border-border/50 group-hover:border-primary/30"
+                                  : "bg-secondary/50 border-2 border-border/30"
+                            }
+                          `}
+                          style={isActive ? { borderColor: `hsl(var(${glowVar}) / 0.5)` } : {}}
+                        >
+                          {!accessible ? (
+                            <Lock className="h-4 w-4 text-muted-foreground/50" />
+                          ) : completed ? (
+                            <CheckCircle2 className="h-5 w-5 text-bio" />
+                          ) : (
+                            <span>{nodeIcon(i)}</span>
+                          )}
+                        </div>
+
+                        {/* Label */}
+                        <div className="flex-1 text-left min-w-0">
+                          <div className="text-xs text-muted-foreground font-mono">
+                            {i < steps.length ? `Level ${i + 1}` : i === steps.length ? "Bonus" : "Final"}
+                          </div>
+                          <div className="text-sm font-medium text-foreground truncate">
+                            {nodeLabel(i)}
+                          </div>
+                        </div>
+
+                        {/* XP badge */}
+                        {accessible && !completed && (
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary shrink-0">
+                            +{i < steps.length ? "20" : i === steps.length ? "15" : "50"} XP
+                          </span>
+                        )}
+                        {completed && (
+                          <Star className="h-4 w-4 text-bio shrink-0" />
+                        )}
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="text-4xl mb-4">{steps[currentScreen].icon}</div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                {steps[currentScreen].title}
-              </h1>
-              <p className="text-muted-foreground leading-relaxed mb-8 max-w-lg mx-auto">
-                {steps[currentScreen].description}
-              </p>
+            </div>
+          </ScrollReveal>
 
-              {/* Detail bullets */}
-              <div className="text-left max-w-md mx-auto space-y-3 mb-8">
-                {steps[currentScreen].details.map((detail, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                    <span className="text-sm text-foreground/80">{detail}</span>
+          {/* Content Panel */}
+          <div className="min-h-[400px]">
+            {/* No selection */}
+            {activeNode === null && !showVideo && !showQuiz && (
+              <ScrollReveal>
+                <div className="glass-card p-12 text-center h-full flex flex-col items-center justify-center">
+                  <div className="text-6xl mb-6">{techEmoji}</div>
+                  <h2 className="text-2xl font-bold text-foreground mb-3">
+                    Ready to explore {techName}?
+                  </h2>
+                  <p className="text-muted-foreground max-w-md mb-8">
+                    Select a level from the map to begin your journey. Complete each level to unlock the next!
+                  </p>
+                  <button
+                    onClick={() => handleNodeClick(0)}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all active:scale-[0.97]"
+                  >
+                    <Play className="h-4 w-4" /> Start Level 1
+                  </button>
+                </div>
+              </ScrollReveal>
+            )}
+
+            {/* Step Content */}
+            {activeNode !== null && (
+              <div key={activeNode} className="animate-fade-up">
+                <div className="glass-card overflow-hidden" style={{
+                  boxShadow: `0 0 40px hsl(var(${glowVar}) / 0.15)`,
+                  borderColor: `hsl(var(${glowVar}) / 0.3)`,
+                }}>
+                  {/* Step image */}
+                  <div className="relative">
+                    <img
+                      src={steps[activeNode].image}
+                      alt={steps[activeNode].title}
+                      className="w-full h-48 md:h-64 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+                    <div className="absolute bottom-4 left-6 flex items-center gap-2">
+                      <span className="px-3 py-1 rounded-lg bg-primary/20 backdrop-blur-sm text-xs font-mono text-primary border border-primary/20">
+                        Level {activeNode + 1}
+                      </span>
+                      <span className="px-3 py-1 rounded-lg bg-secondary/60 backdrop-blur-sm text-xs font-mono text-primary">
+                        +20 XP
+                      </span>
+                    </div>
                   </div>
-                ))}
+
+                  <div className="p-8">
+                    <div className="text-4xl mb-4">{steps[activeNode].icon}</div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                      {steps[activeNode].title}
+                    </h2>
+                    <p className="text-muted-foreground leading-relaxed mb-6">
+                      {steps[activeNode].description}
+                    </p>
+
+                    {/* Details */}
+                    <div className="space-y-3 mb-8">
+                      {steps[activeNode].details.map((detail, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-secondary/30">
+                          <Zap className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                          <span className="text-sm text-foreground/80">{detail}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-between">
+                      {activeNode > 0 ? (
+                        <button
+                          onClick={() => setActiveNode(activeNode - 1)}
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all active:scale-[0.97]"
+                        >
+                          <ArrowLeft className="h-4 w-4" /> Previous
+                        </button>
+                      ) : <div />}
+
+                      {unlocked > activeNode ? (
+                        <button
+                          onClick={() => {
+                            if (activeNode < steps.length - 1) setActiveNode(activeNode + 1);
+                            else { setActiveNode(null); setShowVideo(true); }
+                          }}
+                          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all active:scale-[0.97]"
+                        >
+                          Next <ArrowRight className="h-4 w-4" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            handleUnlock();
+                            if (activeNode < steps.length - 1) {
+                              setTimeout(() => setActiveNode(activeNode + 1), 300);
+                            } else {
+                              setTimeout(() => { setActiveNode(null); setShowVideo(true); }, 300);
+                            }
+                          }}
+                          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground text-sm font-medium hover:opacity-90 transition-all active:scale-[0.97] animate-pulse"
+                        >
+                          <Star className="h-4 w-4" /> Unlock & Continue
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
+            )}
 
-              <span className="inline-block text-xs font-mono text-primary/60 mb-2">+20 XP</span>
-            </div>
+            {/* Video Screen */}
+            {showVideo && (
+              <div key="video" className="animate-fade-up">
+                <div className="glass-card p-8 text-center mb-6">
+                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-xs font-mono text-primary mb-4">
+                    <Play className="h-3 w-3" /> Bonus Content · +15 XP
+                  </span>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">🎬 {videoTitle}</h2>
+                  <p className="text-sm text-muted-foreground">Watch the video to learn more</p>
+                </div>
+                <div
+                  className="glass-card overflow-hidden aspect-video cursor-pointer"
+                  onClick={() => watchVideo(techId)}
+                >
+                  <iframe
+                    className="w-full h-full"
+                    src={videoUrl}
+                    title={videoTitle}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between mt-8">
-              <button
-                onClick={() => setCurrentScreen(Math.max(0, currentScreen - 1))}
-                disabled={currentScreen === 0}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed text-muted-foreground hover:text-foreground hover:bg-secondary active:scale-[0.97]"
-              >
-                <ArrowLeft className="h-4 w-4" /> Previous
-              </button>
-              <button
-                onClick={handleUnlockAndNext}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all duration-200 active:scale-[0.97]"
-              >
-                {unlocked > currentScreen ? "Next" : "Unlock & Continue"}
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
+                <div className="flex items-center justify-between mt-6">
+                  <button
+                    onClick={() => { setShowVideo(false); setActiveNode(steps.length - 1); }}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all active:scale-[0.97]"
+                  >
+                    <ArrowLeft className="h-4 w-4" /> Back
+                  </button>
+                  <button
+                    onClick={() => { watchVideo(techId); setShowVideo(false); setShowQuiz(true); }}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all active:scale-[0.97]"
+                  >
+                    <Trophy className="h-4 w-4" /> Take Quiz
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Quiz Screen */}
+            {showQuiz && (
+              <div key="quiz" className="animate-fade-up">
+                <InlineQuiz
+                  techId={techId}
+                  questions={quizQuestions}
+                  onComplete={() => completeQuiz(techId)}
+                  isCompleted={isQuizCompleted(techId)}
+                  onBack={() => { setShowQuiz(false); setShowVideo(true); }}
+                />
+              </div>
+            )}
           </div>
-        )}
-
-        {/* Video Screen */}
-        {isVideoScreen && (
-          <div key="video" className="animate-fade-up">
-            <div className="text-center mb-8">
-              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-2 block">
-                Bonus Content
-              </span>
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">🎬 {videoTitle}</h2>
-              <p className="text-sm text-muted-foreground">Watch the video to earn +15 XP</p>
-            </div>
-            <div
-              className="glass-card overflow-hidden aspect-video cursor-pointer"
-              onClick={() => watchVideo(techId)}
-            >
-              <iframe
-                className="w-full h-full"
-                src={videoUrl}
-                title={videoTitle}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-
-            <div className="flex items-center justify-between mt-8">
-              <button
-                onClick={() => setCurrentScreen(steps.length - 1)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all active:scale-[0.97]"
-              >
-                <ArrowLeft className="h-4 w-4" /> Previous
-              </button>
-              <button
-                onClick={() => { watchVideo(techId); setCurrentScreen(steps.length + 1); }}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all active:scale-[0.97]"
-              >
-                Take Quiz <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Quiz Screen */}
-        {isQuizScreen && (
-          <div key="quiz" className="animate-fade-up">
-            <InlineQuiz
-              techId={techId}
-              questions={quizQuestions}
-              onComplete={() => completeQuiz(techId)}
-              isCompleted={isQuizCompleted(techId)}
-              onBack={() => setCurrentScreen(steps.length)}
-            />
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -240,13 +404,13 @@ function InlineQuiz({
     return (
       <div className="glass-card glow-primary p-10 text-center">
         <div className="text-5xl mb-4">🏆</div>
-        <h3 className="text-2xl font-bold text-foreground mb-2">Quiz Completed!</h3>
-        <p className="text-muted-foreground mb-6">You've already passed this quiz. +50 XP earned.</p>
+        <h3 className="text-2xl font-bold text-foreground mb-2">Quest Complete!</h3>
+        <p className="text-muted-foreground mb-6">You've mastered this path. +50 XP earned.</p>
         <button
           onClick={() => navigate("/")}
           className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all active:scale-[0.97]"
         >
-          Back to Home
+          Return to Base
         </button>
       </div>
     );
@@ -259,11 +423,11 @@ function InlineQuiz({
       <div className="glass-card p-10 text-center">
         <div className="text-5xl mb-4">{passed ? "🎉" : "😅"}</div>
         <h3 className="text-2xl font-bold text-foreground mb-2">
-          {passed ? "Congratulations!" : "Keep Learning!"}
+          {passed ? "Victory!" : "Not Quite!"}
         </h3>
         <p className="text-lg text-muted-foreground mb-2">Score: {score}/{questions.length}</p>
         <p className="text-sm text-muted-foreground mb-6">
-          {passed ? "+50 XP earned!" : "You need 60% to pass. Review and try again."}
+          {passed ? "+50 XP earned! 🌟" : "Need 60% to pass. Try again!"}
         </p>
         <button
           onClick={() => {
@@ -272,7 +436,7 @@ function InlineQuiz({
           }}
           className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all active:scale-[0.97]"
         >
-          {passed ? "Back to Home" : "Try Again"}
+          {passed ? "Return to Base" : "Retry"}
         </button>
       </div>
     );
@@ -299,14 +463,17 @@ function InlineQuiz({
 
   return (
     <div>
-      <div className="text-center mb-6">
+      <div className="glass-card p-6 text-center mb-6">
+        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-xs font-mono text-primary mb-3">
+          <Trophy className="h-3 w-3" /> Final Challenge · +50 XP
+        </span>
         <h2 className="text-2xl font-bold text-foreground mb-1">🎯 Knowledge Quiz</h2>
         <p className="text-sm text-muted-foreground">Question {currentQ + 1} of {questions.length}</p>
       </div>
 
-      <div className="h-1.5 rounded-full bg-secondary mb-8 overflow-hidden">
+      <div className="h-2 rounded-full bg-secondary mb-6 overflow-hidden">
         <div
-          className="h-full bg-primary rounded-full transition-all duration-500"
+          className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-500"
           style={{ width: `${((currentQ) / questions.length) * 100}%` }}
         />
       </div>
@@ -315,10 +482,10 @@ function InlineQuiz({
         <h3 className="text-lg font-semibold text-foreground mb-6">{q.question}</h3>
         <div className="space-y-3">
           {q.options.map((opt, idx) => {
-            let borderClass = "border-border/50 hover:border-primary/50";
+            let stateClass = "border-border/50 hover:border-primary/50";
             if (answered) {
-              if (idx === q.correct) borderClass = "border-bio bg-bio/10";
-              else if (idx === selected) borderClass = "border-destructive bg-destructive/10";
+              if (idx === q.correct) stateClass = "border-bio bg-bio/10";
+              else if (idx === selected) stateClass = "border-destructive bg-destructive/10";
             }
 
             return (
@@ -326,7 +493,7 @@ function InlineQuiz({
                 key={idx}
                 onClick={() => handleSelect(idx)}
                 disabled={answered}
-                className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center gap-3 ${borderClass} ${answered ? "" : "cursor-pointer active:scale-[0.98]"}`}
+                className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center gap-3 ${stateClass} ${answered ? "" : "cursor-pointer active:scale-[0.98]"}`}
               >
                 <span className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-sm font-mono font-semibold text-muted-foreground shrink-0">
                   {String.fromCharCode(65 + idx)}
