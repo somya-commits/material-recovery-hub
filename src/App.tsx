@@ -29,6 +29,7 @@ const App = () => (
             <Route path="/pyrometallurgy" element={<Pyrometallurgy />} />
             <Route path="/hydrometallurgy" element={<Hydrometallurgy />} />
             <Route path="/bioleaching" element={<Bioleaching />} />
+            <Route path="/metal-recovery" element={<MetalRecovery />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
