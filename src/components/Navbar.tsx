@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, FlaskConical, Trophy, Sparkles } from "lucide-react";
+import { Home, FlaskConical, Trophy, Sparkles, Atom } from "lucide-react";
 import { useGame } from "@/contexts/GameContext";
 import { useState } from "react";
 
@@ -59,6 +59,18 @@ const Navbar = () => {
                 </span>
               )}
             </button>
+
+            <Link
+              to="/metal-recovery"
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors duration-200 ${
+                location.pathname === "/metal-recovery"
+                  ? "bg-primary/10 text-primary border border-primary/20"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
+              }`}
+            >
+              <Atom className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Metals</span>
+            </Link>
 
             <Link
               to="/"

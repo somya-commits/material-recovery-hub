@@ -10,6 +10,7 @@ import Index from "./pages/Index.tsx";
 import Pyrometallurgy from "./pages/Pyrometallurgy.tsx";
 import Hydrometallurgy from "./pages/Hydrometallurgy.tsx";
 import Bioleaching from "./pages/Bioleaching.tsx";
+import MetalRecovery from "./pages/MetalRecovery.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/pyrometallurgy" element={<Pyrometallurgy />} />
             <Route path="/hydrometallurgy" element={<Hydrometallurgy />} />
             <Route path="/bioleaching" element={<Bioleaching />} />
+            <Route path="/metal-recovery" element={<MetalRecovery />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
