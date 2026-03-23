@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, FlaskConical, Trophy, Sparkles } from "lucide-react";
+import { Home, FlaskConical, Trophy, Sparkles, Atom } from "lucide-react";
 import { useGame } from "@/contexts/GameContext";
 import { useState } from "react";
 
