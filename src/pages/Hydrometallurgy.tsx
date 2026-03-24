@@ -48,7 +48,7 @@ const quizQuestions = [
 const Hydrometallurgy = () => (
   <TechStepPage
     techId="hydro" techName="Hydrometallurgy" techEmoji="💧" techColor="water"
-    steps={steps} videoUrl="https://www.youtube.com/embed/Kv8knVosXsg"
+    steps={steps} videoUrl="https://www.youtube.com/embed/cIATxjGugN4?start=28"
     videoTitle="Hydrometallurgy Explained" quizQuestions={quizQuestions}
   />
 );
