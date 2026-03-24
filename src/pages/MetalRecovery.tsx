@@ -192,7 +192,34 @@ const MetalRecovery = () => {
         </div>
       </section>
 
-      {/* E-waste composition */}
+      {/* Video Section */}
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-6 max-w-4xl">
+          <ScrollReveal>
+            <div className="text-center mb-8">
+              <span className="text-xs font-mono uppercase tracking-widest text-primary mb-3 block">🎬 Video</span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">
+                Metal Recovery in Action
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                Watch how valuable metals are recovered from electronic waste.
+              </p>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal delay={100}>
+            <div className="rounded-2xl border border-border/30 overflow-hidden aspect-video">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/MFzQr8ZQbCI"
+                title="Metal Recovery Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-6 max-w-4xl">
           <ScrollReveal>
