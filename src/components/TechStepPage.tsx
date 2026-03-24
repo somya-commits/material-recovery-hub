@@ -362,7 +362,7 @@ const TechStepPage = ({
                   <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-2">🎬 {videoTitle}</h2>
                   <p className="text-sm text-muted-foreground">Watch the video to deepen your understanding</p>
                 </div>
-                <div className="rounded-2xl border border-border/30 overflow-hidden aspect-video cursor-pointer" onClick={() => watchVideo(techId)}>
+                <div className="rounded-2xl border border-border/30 overflow-hidden aspect-video" onMouseEnter={() => watchVideo(techId)}>
                   <iframe
                     className="w-full h-full"
                     src={videoUrl}
