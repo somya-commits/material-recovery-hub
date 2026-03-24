@@ -48,7 +48,7 @@ const quizQuestions = [
 const Pyrometallurgy = () => (
   <TechStepPage
     techId="pyro" techName="Pyrometallurgy" techEmoji="🔥" techColor="fire"
-    steps={steps} videoUrl="https://www.youtube.com/embed/XJn9NRkkJqk"
+    steps={steps} videoUrl="https://www.youtube.com/embed/EuGb381dMZA?start=117"
     videoTitle="Pyrometallurgy Explained" quizQuestions={quizQuestions}
   />
 );
